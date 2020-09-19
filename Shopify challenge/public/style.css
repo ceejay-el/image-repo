@@ -1,0 +1,35 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:700,300");
+
+:root {
+    background: #111;
+    --dark-blue: #192841;
+}
+html {
+    width: 100%;
+    overflow-x: hidden;
+    font-family: "Open Sans", Arial, Helvetica, sans-serif;
+    z-index: 0;
+}
+
+.navbar {
+    background: rgba(0, 0, 0, 0);
+}
+.logo {
+    width: 300px;
+    height: auto;
+    margin-bottom: -8rem;
+}
+.frame {
+    margin-top: -6.5rem;
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+	box-shadow: 4px 8px 16px 0 rgba(0, 0, 0, 0.1);
+	background: linear-gradient(to bottom right, #1338be 0%, #241571 100%);
+	color: #333;
+	font-family: "Open Sans", Helvetica, sans-serif;
+}
+.jumbotron {
+    border-radius: 0;
+    margin: 0;
+}
+.icon {margin: .5rem auto .8rem auto;}
