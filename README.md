@@ -1,2 +1,2 @@
 # image-repo
-Winter 2021 internship Challenge, Shopify
+NodeJS image upload to Mongodb with multer.
