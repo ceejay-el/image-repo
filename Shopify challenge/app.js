@@ -1,95 +1,45 @@
 /**
- # UPLOAD IMAGES TO REPOSITORY
+ # UPLOAD IMAGES TO REPOSITORIES
  * upload images to mongodb using mongoose and multer
  * include user authentication with md5 encryption
  */
 // require dependencies
+// require dependencies
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const multer = require("multer");
-const GridFsStorage = require("multer-gridfs-storage");
 const methodOverride = require("method-override");
-const path = require("path");
-const gridfsStream = require("gridfs-stream");
+const engines = require("./engines");
 const md5 = require("md5");
 // end of requiring dependencies
 
 
-
-
-// varibale declarations
+// varibale declaration and assignments
 const app = express();
+app.use(express.static("public"));
 const port = process.env.PORT || 3000;
-const mongoURI = process.env.MONGODB_URI;
 // end of variable declarations
 
 
-
-
 /**
- ## MIDDLEWARE
+ * initialize middleware
  */
-app.use(express.static("public"));
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-//end of middleware
+// end of initializing middleware
 
 
-
-
-/**
- ## DATABASE
- * set up new user database
- *
- * connect to the database
- * create model for gallery collection
- * create storage engine
- * initialize gridfs stream
- */
-// set up new user database
-const userSchema = {
-    username: String,
-    password: String
-};
-const User = new mongoose.model("User", userSchema);
-
-// connect to database
-const connect = mongoose.createConnection(mongoURI, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
-
-// create model for gallery collection
-const gallerySchema = mongoose.Schema({
-    path: {type: String},   // store path of uploaded image
-    caption: {type: String} // user caption
-});
-const Gallery = mongoose.model("Gallery", gallerySchema);
-
-// create storage engine
-const storage = new GridFsStorage({
-    url: mongoURI,
-    file: function(req, file){
-        return {
-            filename: "file_" + Date.now()
-        }
-    }
-});
-const upload = multer({storage});
-
-// initialize gridfs stream
-connect.once("open", function(){
-    let gfs = new mongoose.mongo.GridFSBucket(connect.db);
-});
-
-
-
-
-/**
- * USER AUTHENTICATION
- */
-
+// get home page
 app.get("/", function(request, respond){
     respond.sendFile(__dirname + "/public/login.html");
 });
 
+
+/**
+ ## USER AUTHENTICATION
+ * login page (landing), signup page and access to gallery
+ */
 app.get("/signup", function(request, respond){
     respond.sendFile(__dirname + "/public/signup.html");
 })
@@ -107,14 +57,8 @@ app.post("/signup", function(request, respond){
     });
 });
 
-
-
-
-// upload up to 3 images
-app.post("/", upload.array("file", 3), function(request, respond, next){
-    respond.json({file: request.JSON});
-});
-
+// upload images post route
+app.post("/upload", engines.uploadFiles);
 
 
 app.listen(port, function(){
