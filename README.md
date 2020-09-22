@@ -127,5 +127,14 @@ app.post("/signup", function(request, respond){
 ```
 - After you register with just your username and password (anything can do, it's not that serious. I just wanted to make a private-access project), you can log in and view the gallery. Of course, there's nothing to see there since you didn't add anything ><. But below are the pages that you should see.
 - PS. I hope the image markdown works.
-![Signup page](/screenshots/Picture1.png)
-![Login page](/screenshots/Picture2.png)
+> ![Signup page](/screenshots/Picture1.png)
+> ![Login page](/screenshots/Picture2.png)
+* well would you look at that! It works!!
+
+
+## Future of this project
+- The project could do with a little bit more work. Here's what I have in mind
+1. Try to _notify_ the user that the image has actually uploaded. At present, all that happens is show successful connection to database at the terminal and show data metrics in Atlas!! What's up with that??!
+2. View engines. I think I need a view engine. And no, I won't use `ejs` because it makes code look hideous.
+3. Yeah, I think that's about it. I mean I have to move on to something else, right?
+- Ok bye, thank you for attending my TED talk, have a great day. Peace. Chuck out.
