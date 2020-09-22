@@ -12,7 +12,7 @@ NodeJS image upload to Mongodb with multer.
 ### Server-side
 - `app.js` handles user authentication with `md5` password encryption, as well as creating the storage engine and running the express app.
 
-#### Packages used
+#### npm modules
 - **express.js**, a simple NodeJS framework with a robust set of features
 - **mongoose** a "MongoDB object modeling tool designed to work in an asynchronous environment. Mongoose supports both promises and callbacks." Ok basically makes it easier to use the MongoDB in the express server, so that you don't have to write all the MongoDB server code.
 - **body-parser** for parsing the html body data
