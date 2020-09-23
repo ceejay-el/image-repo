@@ -79,7 +79,7 @@ module.exports = {
 };
 ```
 
-- Create the express app server: Require the necessary dependencies; initialize middleware; add the landing, signup and uploads get and post methods. To import the uploading function from `engines.js`, start by importing it:
+- Create the express app server: Require the necessary dependencies; initialize middleware; add the landing, signup and uploads `get` and `post` methods. To use the uploading function from `engines.js`, start by importing it:
 > `const engines = require("./engines");`
 - This would allow you to call the methods from `engines.js`. The post route, for example, uses the uploading function from engines. So:
 > `app.post("/upload", engines.uploadFiles);`
