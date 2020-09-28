@@ -19,6 +19,7 @@ const md5 = require("md5");
 const app = express();
 app.use(express.static("public"));
 const port = process.env.PORT || 3000;
+const userdbURI = process.env.USERDB_URI;
 // end of variable declarations
 
 
@@ -28,6 +29,39 @@ const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 // end of initializing middleware
+
+
+
+
+
+/**
+ ### USER DATABASE
+ * connect to user database
+ * create model for user collection
+ * initialize user server
+ */
+// connect to user database
+async function connectUserdb(){
+    try {
+        await mongoose.connect(userdbURI, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
+        console.log("connected to userdb!");
+    } catch (err) {
+        console.log(err);
+        throw(err);
+    }
+}
+
+// configure user model
+const userSchema = mongoose.Schema({
+    username: String,
+    password: String
+});
+const User = new mongoose.model("User", userSchema);
+
+// initialize mongo userdb server
+connectUserdb();
+
+
 
 
 // get home page
@@ -44,6 +78,8 @@ app.get("/signup", function(request, respond){
     respond.sendFile(__dirname + "/public/signup.html");
 })
 
+
+// register with username and password. Password is excrypted with `md5`
 app.post("/signup", function(request, respond){
     const newUser = new User({
         username: request.body.username,
@@ -56,6 +92,8 @@ app.post("/signup", function(request, respond){
             respond.sendFile(__dirname + "/public/gallery.html");
     });
 });
+
+
 
 // upload images post route
 app.post("/upload", engines.uploadFiles);
