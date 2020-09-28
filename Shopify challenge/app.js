@@ -91,12 +91,15 @@ app.get("/", function(request, respond){
 });
 
 app.post("/", function(request, respond){
-    User.findOne({username: request.body.username}, function(error, foundUser){
+    const username = request.body.username;
+    const password = md5(request.body.password);
+
+    User.findOne({username: username}, function(error, foundUser){
         if (error)
             console.log(error);
         else {
             if (foundUser){
-                if (foundUser.md5(request.body.password) === password)
+                if (foundUser.password === password)
                     respond.sendFile(__dirname + "/public/gallery.html");
                 else
                     respond.send("I feel a great disturbance in the force");
