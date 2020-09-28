@@ -88,7 +88,7 @@ module.exports = {
 
 
 #### start user database server
-- First connect to the user database and configure the User Database model.
+- First initialize user database and configure the User Database model.
 ```
 async function connectUserdb(){
     try {
@@ -130,6 +130,29 @@ app.post("/signup", function(request, respond){
 > ![Signup page](/screenshots/Picture1.png)
 > ![Login page](/screenshots/Picture2.png)
 * well would you look at that! It works!!
+
+#### login
+- `login.html` is the landing page. If you have your toy name and password in the database, you should be able to access `gallery.html`. The callback checks for the correct username and password in the database.
+- Remember, when you run the `md5` hashing function on the same string, the hash that is created will always be the same. This is what we look for in the callback. The user input from the html body is hashed and compared to the hash in the database. If they're the same, we have a successful login. If they're not, well, then _something mighty spooky going on._
+```
+app.post("/", function(request, respond){
+    const username = request.body.username;
+    const password = md5(request.body.password);
+
+    User.findOne({username: username}, function(error, foundUser){
+        if (error)
+            console.log(error);
+        else {
+            if (foundUser){
+                if (foundUser.password === password)
+                    respond.sendFile(__dirname + "/public/gallery.html");
+                else
+                    respond.send("I feel a great disturbance in the force");
+            }
+        }
+    });
+});
+```
 
 
 ## Future of this project
