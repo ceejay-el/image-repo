@@ -23,14 +23,13 @@ const userdbURI = process.env.USERDB_URI;
 // end of variable declarations
 
 
+
 /**
  * initialize middleware
  */
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 // end of initializing middleware
-
-
 
 
 
@@ -63,21 +62,13 @@ connectUserdb();
 
 
 
-
-// get home page
-app.get("/", function(request, respond){
-    respond.sendFile(__dirname + "/public/login.html");
-});
-
-
 /**
- ## USER AUTHENTICATION
+ * ROUTING AND USER AUTHENTICATION
  * login page (landing), signup page and access to gallery
  */
 app.get("/signup", function(request, respond){
     respond.sendFile(__dirname + "/public/signup.html");
 })
-
 
 // register with username and password. Password is excrypted with `md5`
 app.post("/signup", function(request, respond){
@@ -94,9 +85,26 @@ app.post("/signup", function(request, respond){
 });
 
 
+// get landing page - `login.html`
+app.get("/", function(request, respond){
+    respond.sendFile(__dirname + "/public/login.html");
+});
 
-// upload images post route
-app.post("/upload", engines.uploadFiles);
+app.post("/", function(request, respond){
+    User.findOne({username: request.body.username}, function(error, foundUser){
+        if (error)
+            console.log(error);
+        else {
+            if (foundUser){
+                if (foundUser.md5(request.body.password) === password)
+                    respond.sendFile(__dirname + "/public/gallery.html");
+                else
+                    respond.send("I feel a great disturbance in the force");
+            }
+        }
+    });
+});
+
 
 
 app.listen(port, function(){
