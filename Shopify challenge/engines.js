@@ -1,7 +1,6 @@
 /**
  # UPLOAD IMAGES TO REPOSITORIES
  * upload images to mongodb using mongoose and multer
- * include user authentication with md5 encryption
  */
 // require dependencies
 require("dotenv").config();
@@ -10,72 +9,33 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const GridFsStorage = require("multer-gridfs-storage");
+const Grid = require("gridfs-stream");
 const methodOverride = require("method-override");
 const path = require("path");
-const gridfsStream = require("gridfs-stream");
-const md5 = require("md5");
 const util = require("util");
 // end of requiring dependencies
 
 
-
 // varibale declaration and assignments
 const app = express();
-const userdbURI = process.env.USERDB_URI;
+const connect = mongoose.createConnection(process.env.GALLERYDB_URI, {useUnifiedTopology: true, useNewUrlParser: true});
+let gfs;
 // end of variable declarations
 
 
-
-
-
 /**
- ### USER DATABASE
- * connect to user database
- * create model for user collection
- * initialize user server
+ * initialize middleware
  */
-// connect to user database
-async function connectUserdb(){
-    try {
-        await mongoose.connect(userdbURI, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
-        console.log("connected to userdb!");
-    } catch (err) {
-        console.log(err);
-        throw(err);
-    }
-}
-
-// configure user model
-const userSchema = mongoose.Schema({
-    username: String,
-    password: String
-});
-const User = new mongoose.model("User", userSchema);
-
-// initialize mongo userdb server
-connectUserdb();
-
-// handle user registration with md5 encryption
-/*
-function registerUser(request, respond){
-    const newUser = new User({
-        username: request.body.username,
-        password: md5(request.body.password)
-    });
-    newUser.save(function(err){
-        if (err)
-            console.log(err)
-        else
-            respond.sendFile(__dirname + "/public/gallery.html");
-    });
-}
-*/
+app.set("view engine", "ejs");
+app.use(bodyParser.json());
+app.use(methodOverride("_method"));
+// end of initializing middleware
 
 
 
 
 /**
- ### GALLERY DATABASE
+ ### GALLERY DATABASE ================================================================================= /
  * create model for gallery collection
  * create storage engine
  * initialize gridfs stream
@@ -92,20 +52,28 @@ const Gallery = mongoose.model("Gallery", gallerySchema);
 const storage = new GridFsStorage({
     url: process.env.GALLERYDB_URI,
     options: {useNewUrlParser: true, useUnifiedTopology: true},
-    file: function(req, file){
+    file: function(request, file){
         const match = ["image/png", "image/jpeg"];
         if(match.indexOf(file.mimetype) === -1){
-            return {
-                filename: "file_" + Date.now() + path.extname(file.originalname),
-                bucketname: "uploads"
-            };
+            return new Promise(function(reject, resolve){
+                const fileInfo = {
+                    filename: "image_" + Date.now() + path.extname(file.originalname),
+                    bucketname: "uploads"
+                };
+                resolve(fileInfo);
+            });
         }
     }
 });
 
 // initialize GridFS stream and upload up to 5 images
-const upload = multer({storage: storage}).array("files", 10);
+const upload = multer({storage: storage}).array("files", 5);
 const uploadFilesEngine = util.promisify(upload);
+
+connect.once("open", function(){
+    gfs = Grid(connect.db, mongoose.mongo);
+});
+// ------------------------------------------------------------------------------------------------- /
 
 
 // handle multiple image uploads and export to `app.js`
@@ -116,8 +84,9 @@ async function uploadImages(request, respond){
         console.log(request.files);
         if(request.files.length <= 0)
             return respond.send("Ay, select a file! At least ONE file!");
-        else
-            respond.send("Good work, now go grab yourself a biscuit or something");
+        else {
+            respond.redirect("/upload");
+        }
     } catch (err) {
         console.log(err);
         if (err.code === "LIMIT_UNEXPECTED_FILE")
@@ -126,4 +95,17 @@ async function uploadImages(request, respond){
             return respond.send("Might I interest you in upload error? No? Ok.");
     }
 }
-module.exports = {uploadFiles: uploadImages};
+module.exports.uploadFiles = uploadImages;
+
+
+// display image
+module.exports.displayImage = function(request, respond){
+    gfs.files.findOne({filename: request.params.filename}, function(error, file){
+        if(!file || file.length === 0)
+            return respond.status(404).send("Oops. The file you are looking for does not exist");
+        else {
+            gfs.createReadStream(file.filename).pipe(respond);
+        }
+    })
+}
+// ================================================================================================= /

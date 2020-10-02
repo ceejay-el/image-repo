@@ -18,3 +18,7 @@ $(document).ready(function(){
         previews(this, "preview-images");
     });
 });
+
+$(".btn").click(function(){
+    console.log("You dumbass piece of shit!")
+});

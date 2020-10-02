@@ -1,6 +1,6 @@
 /**
  # UPLOAD IMAGES TO REPOSITORIES
- * upload images to mongodb using mongoose and multer
+ * running server program
  * include user authentication with md5 encryption
  */
 // require dependencies
@@ -17,7 +17,6 @@ const md5 = require("md5");
 
 // varibale declaration and assignments
 const app = express();
-app.use(express.static("public"));
 const port = process.env.PORT || 3000;
 const userdbURI = process.env.USERDB_URI;
 // end of variable declarations
@@ -29,6 +28,8 @@ const userdbURI = process.env.USERDB_URI;
  */
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.static("public"));
+app.set("view engine", "ejs");
 // end of initializing middleware
 
 
@@ -63,7 +64,7 @@ connectUserdb();
 
 
 /**
- * ROUTING AND USER AUTHENTICATION
+ * ROUTING AND USER AUTHENTICATION ======================================================== //
  * login page (landing), signup page and access to gallery
  */
 app.get("/signup", function(request, respond){
@@ -80,7 +81,7 @@ app.post("/signup", function(request, respond){
         if (err)
             console.log(err)
         else
-            respond.sendFile(__dirname + "/public/gallery.html");
+            respond.redirect("/upload");
     });
 });
 
@@ -100,13 +101,28 @@ app.post("/", function(request, respond){
         else {
             if (foundUser){
                 if (foundUser.password === password)
-                    respond.sendFile(__dirname + "/public/gallery.html");
+                    respond.redirect("/upload");
                 else
                     respond.send("I feel a great disturbance in the force");
             }
         }
     });
 });
+// ======================================================================================= //
+
+
+/**
+ * IMAGE REPOSITORY GRAPHICAL INTERFACE ================================================== //
+ */
+app.get("/upload", function(request, respond){    
+    respond.render("gallery");
+});
+
+app.post("/upload", engines.uploadFiles);
+
+// display image
+app.get("/images/:image", engines.displayImage);
+// ====================================================================================== //
 
 
 
