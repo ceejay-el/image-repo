@@ -72,3 +72,4 @@ html {
 }
 .icon {margin: .5rem auto .8rem auto;}
 .preview-images > img {width: 30%;}
+.previews {background: var(--dark-blue);}
