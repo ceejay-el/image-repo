@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <script src="https://kit.fontawesome.com/cead0ad813.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="/style.css">
+
+    <title> Gallery </title>
+</head>
+
+<style>
+  img {width: 100%;}
+</style>
+
+<body>
+    <nav class="navbar navbar-light bg-transparent">
+        <a class="navbar-brand" href="#">
+          <img src="/img/logo.png" class="logo align-top" alt="" loading="lazy">
+        </a>
+      </nav>
+
+      <section>
+        <div class="frame">
+          <div class="container">
+            <div class="jumbotron">
+              <div class="header-icons">
+                <div class="row">
+                  <div class="icon">
+                    <i class="fas fa-icons fa-5x"></i>
+                  </div>
+              </div>
+              <hr class="my-2">
+              <form action="/upload" method="post" enctype="multipart/form-data">
+                <div class="custom-file mb-2">
+                  <input type="file" name="files" id="file" class="custom-file-input">
+                  <label for="file" class="custom-file-label"> Choose image </label>
+                  <input type="submit" value="Upload" class="btn btn-block btn-outline-primary mt-2">
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="previews">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="preview-images">
+
+                <% if(files){ %>
+                <%  files.forEach(function(file){ %>
+                    <div class="previews card card-body m-1">
+                <%      if(file.isImage){ %>
+                        <img src="/images/<%= file.filename %>" alt="" srcset="">
+                <%      } else { %>
+                        <%= file.filename %>
+                <%      } %>
+                <form action="/images/<%= file._id %>?_method=DELETE" method="post">
+                  <button class="btn btn-info mt-1"> Delete </button>
+                </form>
+                    </div>
+                <%  }); %>
+                <% } else { %>
+                  <p>Hey look! It's nothing!</p>
+                <% } %>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    <!-- js imports -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <script src="/index.js"></script>
+</body>
+</html>
