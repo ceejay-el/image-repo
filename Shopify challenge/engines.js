@@ -13,12 +13,12 @@ const Grid = require("gridfs-stream");
 const methodOverride = require("method-override");
 const path = require("path");
 const util = require("util");
+const crypto = require("crypto");
 // end of requiring dependencies
 
 
 // varibale declaration and assignments
 const app = express();
-const connect = mongoose.createConnection(process.env.GALLERYDB_URI, {useUnifiedTopology: true, useNewUrlParser: true});
 let gfs;
 // end of variable declarations
 
@@ -40,7 +40,6 @@ app.use(methodOverride("_method"));
  * create storage engine
  * initialize gridfs stream
  */
-
 // configure model for gallery collection
 const gallerySchema = mongoose.Schema({
     path: {type: String},   // store path of uploaded image
@@ -52,17 +51,19 @@ const Gallery = mongoose.model("Gallery", gallerySchema);
 const storage = new GridFsStorage({
     url: process.env.GALLERYDB_URI,
     options: {useNewUrlParser: true, useUnifiedTopology: true},
-    file: function(request, file){
-        const match = ["image/png", "image/jpeg"];
-        if(match.indexOf(file.mimetype) === -1){
-            return new Promise(function(reject, resolve){
+    file: function(req, file){
+        return new Promise(function(resolve, reject){
+            crypto.randomBytes(16, function(err, buf){
+                if (err) {
+                return reject(err);
+                }
                 const fileInfo = {
                     filename: "image_" + Date.now() + path.extname(file.originalname),
-                    bucketname: "uploads"
+                    bucketName: "uploads"
                 };
                 resolve(fileInfo);
             });
-        }
+        });
     }
 });
 
@@ -70,8 +71,10 @@ const storage = new GridFsStorage({
 const upload = multer({storage: storage}).array("files", 5);
 const uploadFilesEngine = util.promisify(upload);
 
+const connect = mongoose.createConnection(process.env.GALLERYDB_URI, {useUnifiedTopology: true, useNewUrlParser: true});
 connect.once("open", function(){
     gfs = Grid(connect.db, mongoose.mongo);
+    gfs.collection("uploads");
 });
 // ------------------------------------------------------------------------------------------------- /
 
@@ -104,8 +107,11 @@ module.exports.displayImage = function(request, respond){
         if(!file || file.length === 0)
             return respond.status(404).send("Oops. The file you are looking for does not exist");
         else {
-            gfs.createReadStream(file.filename).pipe(respond);
+            return gfs.createReadStream(file.filename).pipe(respond);
         }
-    })
+    });
 }
+/**
+ * 
+ */
 // ================================================================================================= /
