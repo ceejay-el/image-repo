@@ -14,7 +14,7 @@ $(document).ready(function(){
             }
         }
     };
-    $("#file").on("change", function(){
+    $("#file").on("click", function(){
         previews(this, "preview-images");
     });
 });

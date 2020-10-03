@@ -10,6 +10,10 @@
     <title> Gallery </title>
 </head>
 
+<style>
+  img {width: 100%;}
+</style>
+
 <body>
     <nav class="navbar navbar-light bg-transparent">
         <a class="navbar-brand" href="#">
@@ -44,7 +48,26 @@
         <div class="container">
           <div class="row">
             <div class="col-md-4">
-              <div class="preview-images"></div>
+              <div class="preview-images">
+
+                <% if(files){ %>
+                <%  files.forEach(function(file){ %>
+                    <div class="card card-body m-2">
+                <%      if(file.isImage){ %>
+                        <img src="/images/<%= file.filename %>" alt="" srcset="">
+                <%      } else { %>
+                        <%= file.filename %>
+                <%      } %>
+                <form action="/images/<%= file._id %>?_method=DELETE" method="post">
+                  <button class="btn btn-info mt-1"> Delete </button>
+                </form>
+                    </div>
+                <%  }); %>
+                <% } else { %>
+                  <p>Hey look! It's nothing!</p>
+                <% } %>
+
+              </div>
             </div>
           </div>
         </div>

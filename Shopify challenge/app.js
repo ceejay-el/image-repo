@@ -30,6 +30,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 app.set("view engine", "ejs");
+app.use(methodOverride("_method"));
 // end of initializing middleware
 
 
@@ -114,14 +115,15 @@ app.post("/", function(request, respond){
 /**
  * IMAGE REPOSITORY GRAPHICAL INTERFACE ================================================== //
  */
-app.get("/upload", function(request, respond){    
-    respond.render("gallery");
-});
+app.get("/upload", engines.galleryDisplay);
 
 app.post("/upload", engines.uploadFiles);
 
 // display image
-app.get("/images/:image", engines.displayImage);
+app.get("/images/:filename", engines.displayImage);
+
+// delete image
+app.delete("/images/:id", engines.deleteImage);
 // ====================================================================================== //
 
 

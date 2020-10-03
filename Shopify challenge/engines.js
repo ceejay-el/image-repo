@@ -99,8 +99,11 @@ async function uploadImages(request, respond){
     }
 }
 module.exports.uploadFiles = uploadImages;
+// ================================================================================================= /
 
-
+/**
+ * CALLBACKS FOR APP.JS ROUTES ===================================================================== //
+ */ 
 // display image
 module.exports.displayImage = function(request, respond){
     gfs.files.findOne({filename: request.params.filename}, function(error, file){
@@ -111,7 +114,31 @@ module.exports.displayImage = function(request, respond){
         }
     });
 }
-/**
- * 
- */
-// ================================================================================================= /
+
+// load web gallery
+module.exports.galleryDisplay = function(request, respond){
+    gfs.files.find().toArray(function(error, files){
+        if(!files || files.length === 0)
+            respond.render("gallery", {files: false});
+        else {
+            files.map(function(file){
+                if(file.contentType === "image/jpeg" || file.contentType === "image/png")
+                    file.isImage = true;
+                else
+                    file.isImage = false;
+            });
+            respond.render("gallery", {files: files})
+        }
+    });
+}
+
+// delete images
+module.exports.deleteImage = function(request, respond){
+    gfs.remove({_id: request.params.id, root: "uploads"}, function(error, gridStore){
+        if(error)
+            return respond.send("You won't let me live... You won't let me die");
+        else
+            respond.redirect("/upload");
+    });
+}
+// ================================================================================================= //
